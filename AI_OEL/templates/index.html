@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surgery Scheduling</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+
+<body>
+    <h1>Surgery Scheduling with Genetic Algorithm</h1>
+    <form method="POST" action="/generate_schedule">
+        <label>Number of Surgeries:</label>
+        <input type="number" name="num_surgeries" id="surgeries" min="1" required><br>
+        
+        <label>Number of Rooms:</label>
+        <input type="number" name="num_rooms" id="rooms" min="1" required><br>
+        
+        <label>Number of Staff:</label>
+        <input type="number" name="num_staff" id="staff" min="1" required><br>
+
+        <div id="surgery-details"></div>
+        <div id="staff-skills"></div>
+
+        <button type="button" onclick="generateDetails()">Generate Details</button>
+        <button type="submit">Submit</button>
+    </form>
+
+    {% if schedule %}
+    <h2>Schedule:</h2>
+    <ul>
+        {% for surgery in schedule %}
+        <li>
+            Surgery {{ surgery.surgery }}: 
+            Room {{ surgery.room }}, 
+            Slots {{ surgery.slots }}, 
+            Assigned to Staff: {{ surgery.staff }}
+        </li>
+        {% endfor %}
+    </ul>    
+    
+    {% endif %}
+
+    {% if error %}
+    <p style="color: red;">{{ error }}</p>
+    {% endif %}
+
+    <script>
+        function generateDetails() {
+            const surgeries = document.getElementById('surgeries').value;
+            const staff = document.getElementById('staff').value;
+
+            const surgeryDetailsDiv = document.getElementById('surgery-details');
+            const staffSkillsDiv = document.getElementById('staff-skills');
+
+            surgeryDetailsDiv.innerHTML = '<h3>Enter Surgery Durations (minutes):</h3>';
+            staffSkillsDiv.innerHTML = '<h3>Assign Staff for Each Surgery:</h3>';
+
+            for (let i = 1; i <= surgeries; i++) {
+                surgeryDetailsDiv.innerHTML += `
+                    <div>
+                        <label>Surgery ${i}:</label>
+                        <input type="number" name="duration_${i}" min = "1" required>
+                    </div>
+                `;
+
+                let skillRow = `<h4>Surgery ${i} - Select Skilled Staff:</h4>`;
+                for (let j = 1; j <= staff; j++) {
+                    skillRow += `
+                        <label>Staff ${j}:</label>
+                        <input type="checkbox" name="surgery_${i}_staff_${j}" value="1">
+                        <input type="hidden" name="surgery_${i}_staff_${j}" value="0">
+                    `;
+                }
+                staffSkillsDiv.innerHTML += skillRow;
+            }
+        }
+
+
+    </script>
+</body>
+
+</html>
